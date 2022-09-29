@@ -33,6 +33,7 @@
 #include <stdexcept>   /* for std::runtime_error */
 #include <string>      /* for std::string */
 #include <type_traits> /* for std::is_pod<> */
+#include <utility>     /* for std::exchange */
 
 namespace lmdb {
   using mode = mdb_mode_t;
@@ -1339,8 +1340,7 @@ public:
    * @post `handle() == nullptr`
    */
   void commit() {
-    lmdb::txn_commit(_handle);
-    _handle = nullptr;
+    lmdb::txn_commit(std::exchange(_handle, nullptr));
   }
 
   /**
@@ -1349,8 +1349,7 @@ public:
    * @post `handle() == nullptr`
    */
   void abort() noexcept {
-    lmdb::txn_abort(_handle);
-    _handle = nullptr;
+    lmdb::txn_abort(std::exchange(_handle, nullptr));
   }
 
   /**
